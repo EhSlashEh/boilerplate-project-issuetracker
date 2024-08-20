@@ -23,27 +23,27 @@ module.exports = function (app) {
     })
 
     .post(async function (req, res) {
-      let projectName = req.params.project;
+      let project = req.params.project;
       const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
-
+    
       if (!issue_title || !issue_text || !created_by) {
         return res.status(400).send("Required field(s) missing");
       }
-
+    
       try {
-        let projectModel = await ProjectModel.findOne({ name: projectName });
+        let projectModel = await ProjectModel.findOne({ name: project });
         if (!projectModel) {
-          projectModel = new ProjectModel({ name: projectName });
+          projectModel = new ProjectModel({ name: project });
           projectModel = await projectModel.save();
         }
-        const newIssue = await createIssue(projectModel._id, issue_title, issue_text, created_by, assigned_to, status_text);
+        const newIssue = await createIssue(project, issue_title, issue_text, created_by, assigned_to, status_text);
         res.json(newIssue);
       } catch (err) {
-        console.error('Error creating issue:', err);
+        console.error('Error creating issue:', err); // Add this line
         res.status(500).send(err.message);
       }
     })
-
+    
     .put(async function (req, res) {
       let projectName = req.params.project;
       const { _id, issue_title, issue_text, created_by, assigned_to, status_text, open } = req.body;
