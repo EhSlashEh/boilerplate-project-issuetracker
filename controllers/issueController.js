@@ -1,4 +1,6 @@
-const Issue = require('../models/issueModel');
+// controllers/issueController.js
+
+const { Issue } = require('../models/issueModel');
 
 // Get issues by project
 const getIssuesByProject = async (project) => {
