@@ -1,4 +1,4 @@
-const mongoose = requite("mongoose");
+const mongoose = require("mongoose");
 
 const uri = process.env.MONGO_URI;
 
