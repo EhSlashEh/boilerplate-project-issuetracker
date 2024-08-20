@@ -5,6 +5,8 @@ const {
   updateIssue,
   deleteIssue
 } = require('../controllers/issueController');
+const IssueModel = require("../models/issueModel").Issue;
+const ProjectModel = require("../models/issueModel").Project;
 
 module.exports = function (app) {
 
@@ -25,11 +27,16 @@ module.exports = function (app) {
       const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
 
       if (!issue_title || !issue_text || !created_by) {
-        return res.status(400).send("Required fields missing");
+        return res.status(400).send("Required field(s) missing");
       }
 
       try {
-        const newIssue = await createIssue(project, issue_title, issue_text, created_by, assigned_to, status_text);
+        let projectModel = await ProjectModel.findOne({ name: projectName });
+        if (!projectModel) {
+          projectModel = new ProjectModel({ name: projectName });
+          projectModel = await projectModel.save();
+        }
+        const issueModel = await createIssue(project, issue_title, issue_text, created_by, assigned_to, status_text);
         res.json(newIssue);
       } catch (err) {
         res.status(500).send(err.message);
