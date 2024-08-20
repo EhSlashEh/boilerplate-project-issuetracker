@@ -7,7 +7,7 @@ const getIssuesByProject = async (project) => {
   try {
     return await Issue.find({ project }).exec();
   } catch (err) {
-    throw new Error('Failed to retrieve issues');
+    throw new Error(`Failed to retrieve issues: ${err.message}`);
   }
 };
 

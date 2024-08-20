@@ -13,9 +13,9 @@ module.exports = function (app) {
   app.route('/api/issues/:project')
 
     .get(async function (req, res) {
-      let project = req.params.project;
+      let projectName = req.params.project;
       try {
-        const issues = await getIssuesByProject(project);
+        const issues = await getIssuesByProject(projectName);
         res.json(issues);
       } catch (err) {
         res.status(500).send(err.message);
@@ -23,7 +23,7 @@ module.exports = function (app) {
     })
 
     .post(async function (req, res) {
-      let project = req.params.project;
+      let projectName = req.params.project;
       const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
 
       if (!issue_title || !issue_text || !created_by) {
@@ -36,15 +36,16 @@ module.exports = function (app) {
           projectModel = new ProjectModel({ name: projectName });
           projectModel = await projectModel.save();
         }
-        const issueModel = await createIssue(project, issue_title, issue_text, created_by, assigned_to, status_text);
+        const newIssue = await createIssue(projectModel._id, issue_title, issue_text, created_by, assigned_to, status_text);
         res.json(newIssue);
       } catch (err) {
+        console.error('Error creating issue:', err);
         res.status(500).send(err.message);
       }
     })
 
     .put(async function (req, res) {
-      let project = req.params.project;
+      let projectName = req.params.project;
       const { _id, issue_title, issue_text, created_by, assigned_to, status_text, open } = req.body;
 
       if (!_id) {
@@ -52,7 +53,12 @@ module.exports = function (app) {
       }
 
       try {
-        const updatedIssue = await updateIssue(_id, project, { issue_title, issue_text, created_by, assigned_to, status_text, open });
+        const projectModel = await ProjectModel.findOne({ name: projectName });
+        if (!projectModel) {
+          return res.status(400).send("Project not found");
+        }
+
+        const updatedIssue = await updateIssue(_id, projectModel._id, { issue_title, issue_text, created_by, assigned_to, status_text, open });
         if (updatedIssue) {
           res.send("successfully updated");
         } else {
@@ -64,7 +70,7 @@ module.exports = function (app) {
     })
 
     .delete(async function (req, res) {
-      let project = req.params.project;
+      let projectName = req.params.project;
       const { _id } = req.body;
 
       if (!_id) {
@@ -72,7 +78,12 @@ module.exports = function (app) {
       }
 
       try {
-        const deletedIssue = await deleteIssue(_id, project);
+        const projectModel = await ProjectModel.findOne({ name: projectName });
+        if (!projectModel) {
+          return res.status(400).send("Project not found");
+        }
+
+        const deletedIssue = await deleteIssue(_id, projectModel._id);
         if (deletedIssue) {
           res.send(`deleted ${_id}`);
         } else {
