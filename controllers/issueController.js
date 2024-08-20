@@ -13,7 +13,7 @@ const getIssuesByProject = async (project) => {
 const createIssue = async (project, issue_title, issue_text, created_by, assigned_to = '', status_text = '') => {
   try {
     const newIssue = new Issue({
-      project,
+      projectId: project,
       issue_title,
       issue_text,
       created_by,
@@ -36,7 +36,7 @@ const updateIssue = async (_id, project, updates) => {
     updates.updated_on = new Date();
 
     const updatedIssue = await Issue.findOneAndUpdate(
-      { _id, project },
+      { _id, projectId: project },
       updates,
       { new: true }
     ).exec();
@@ -54,7 +54,7 @@ const updateIssue = async (_id, project, updates) => {
 // Delete an issue
 const deleteIssue = async (_id, project) => {
   try {
-    const deletedIssue = await Issue.findOneAndDelete({ _id, project }).exec();
+    const deletedIssue = await Issue.findOneAndDelete({ _id, projectId: project }).exec();
     
     if (!deletedIssue) {
       throw new Error(`No issue found to delete with _id: "${_id}" and project: "${project}"`);
