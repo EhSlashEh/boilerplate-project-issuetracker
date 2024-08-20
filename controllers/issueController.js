@@ -1,5 +1,3 @@
-// controllers/issueController.js
-
 const Issue = require('../models/issueModel');
 
 // Get issues by project
@@ -7,7 +5,7 @@ const getIssuesByProject = async (project) => {
   try {
     return await Issue.find({ project }).exec();
   } catch (err) {
-    throw new Error(`Failed to retrieve issues: ${err.message}`);
+    throw new Error(`Failed to retrieve issues for project "${project}": ${err.message}`);
   }
 };
 
@@ -28,7 +26,7 @@ const createIssue = async (project, issue_title, issue_text, created_by, assigne
 
     return await newIssue.save();
   } catch (err) {
-    throw new Error('Failed to create issue');
+    throw new Error(`Failed to create issue for project "${project}" with title "${issue_title}": ${err.message}`);
   }
 };
 
@@ -43,9 +41,13 @@ const updateIssue = async (_id, project, updates) => {
       { new: true }
     ).exec();
 
+    if (!updatedIssue) {
+      throw new Error(`No issue found to update with _id: "${_id}" and project: "${project}"`);
+    }
+
     return updatedIssue;
   } catch (err) {
-    throw new Error('Failed to update issue');
+    throw new Error(`Failed to update issue with _id: "${_id}" for project "${project}": ${err.message}`);
   }
 };
 
@@ -53,9 +55,14 @@ const updateIssue = async (_id, project, updates) => {
 const deleteIssue = async (_id, project) => {
   try {
     const deletedIssue = await Issue.findOneAndDelete({ _id, project }).exec();
+    
+    if (!deletedIssue) {
+      throw new Error(`No issue found to delete with _id: "${_id}" and project: "${project}"`);
+    }
+
     return deletedIssue;
   } catch (err) {
-    throw new Error('Failed to delete issue');
+    throw new Error(`Failed to delete issue with _id: "${_id}" for project "${project}": ${err.message}`);
   }
 };
 
