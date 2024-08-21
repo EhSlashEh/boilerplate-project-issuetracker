@@ -9,13 +9,13 @@ const IssueModel = require("../models/issueModel").Issue;
 
 module.exports = function (app) {
 
-  app.route('/api/issues/:project')
+  app.route('/api/issues/:issueId')
 
     // Get an issue by its ID
     .get(async function (req, res) {
-      let issueId = req.params.project; // Assuming `project` parameter is actually the issue ID
+    const issueId = req.params.issueId;
       try {
-        const issue = await getIssueById(issueId);
+        const issue = await IssueModel.findById(issueId).exec();
         if (issue) {
           res.json(issue);
         } else {

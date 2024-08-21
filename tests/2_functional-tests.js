@@ -67,16 +67,25 @@ suite('Functional Tests', function() {
   suite('GET /api/issues/{project} => Array of objects with issue data', function() {
 
     test('View an issue by ID', function(done) {
+      const validIssueId = '66c64fe3ad6cb41018c9b089';
+
       chai.request(server)
-        .get('/api/issues/test')
-        .end(function(err, res){
-          assert.equal(res.status, 200);
-          assert.isArray(res.body);
-          assert.property(res.body[0], 'issue_title');
-          assert.property(res.body[0], 'issue_text');
-          assert.property(res.body[0], 'created_by');
-          done();
-        });
+      .get(`/api/issues/${validIssueId}`)
+      .end(function(err, res){
+        if (err) {
+          console.error('Error:', err);
+        }
+        assert.equal(res.status, 200);
+        assert.isObject(res.body);
+        assert.property(res.body, 'issue_title');
+        assert.property(res.body, 'issue_text');
+        assert.property(res.body, 'created_by');
+        assert.property(res.body, 'created_on');
+        assert.property(res.body, 'updated_on');
+        assert.property(res.body, 'open');
+        assert.property(res.body, '_id');
+        done();
+      });
     });
 
     test('View issues on a project with one filter', function(done) {
