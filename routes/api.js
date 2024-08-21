@@ -14,23 +14,31 @@ module.exports = function (app) {
 
   app.route('/api/issues/:project')
 
-    // Get an issue by its ID
     .get(async function (req, res) {
-    const issueId = req.params.issueId;
+    let projectName = req.params.project;
       try {
-        const issue = await IssueModel.findById(issueId).exec();
-        if (issue) {
-          res.json(issue);
+        const project = await ProjectModel.findOne({ name: projectName });
+        if (!project) {
+          res.json([{ error: "project not found" }]);
+          return;
         } else {
-          res.status(404).send("Issue not found");
+          const issues = await IssueModel.find({
+            projectId: project._id,
+            ...req.query
+          });
+          if (!issues) {
+            res.json([{ error: "no issues found"}]);
+            return
+          }
+          res.json(issues);
         }
       } catch (err) {
-        res.status(500).send(err.message);
+        res.json({ error: "could not get", _id: _id });
       }
     })
 
-    // Create a new issue
     .post(async function (req, res) {
+      let projectName = req.params.project;
       const { project } = req.params; // If `project` is needed for creating issues
       const { issue_title, issue_text, created_by, assigned_to = '', status_text = '' } = req.body;
 
