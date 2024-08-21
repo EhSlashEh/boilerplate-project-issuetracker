@@ -7,8 +7,8 @@ const {
   deleteIssue
 } = require('../controllers/issueController');
 
-const IssueModel = require("../models").Issue;
-const ProjectModel = require("../models").Project;
+const IssueModel = require("../models/issueModel").Issue;
+const ProjectModel = require("../models/issueModel").Project;
 
 module.exports = function (app) {
 
