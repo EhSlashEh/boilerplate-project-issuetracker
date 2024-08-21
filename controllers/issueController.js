@@ -14,59 +14,57 @@ const getIssueById = async (issueId) => {
 };
 
 // Create a new issue
-const createIssue = async (project, issue_title, issue_text, created_by, assigned_to = '', status_text = '') => {
+const createIssue = async (projectId, issue_title, issue_text, created_by, assigned_to = '', status_text = '') => {
   try {
     const newIssue = new Issue({
-      projectId: project,
+      projectId,
       issue_title,
       issue_text,
       created_by,
       assigned_to,
       status_text,
-      open: true,
-      created_on: new Date(),
-      updated_on: new Date()
+      open: true
     });
 
     return await newIssue.save();
   } catch (err) {
-    throw new Error(`Failed to create issue for project "${project}" with title "${issue_title}": ${err.message}`);
+    throw new Error(`Failed to create issue for project "${projectId}" with title "${issue_title}": ${err.message}`);
   }
 };
 
 // Update an existing issue
-const updateIssue = async (_id, project, updates) => {
+const updateIssue = async (_id, projectId, updates) => {
   try {
     updates.updated_on = new Date();
 
     const updatedIssue = await Issue.findOneAndUpdate(
-      { _id, projectId: project },
+      { _id, projectId },
       updates,
       { new: true }
     ).exec();
 
     if (!updatedIssue) {
-      throw new Error(`No issue found to update with _id: "${_id}" and project: "${project}"`);
+      throw new Error(`No issue found to update with _id: "${_id}" and project: "${projectId}"`);
     }
 
     return updatedIssue;
   } catch (err) {
-    throw new Error(`Failed to update issue with _id: "${_id}" for project "${project}": ${err.message}`);
+    throw new Error(`Failed to update issue with _id: "${_id}" for project "${projectId}": ${err.message}`);
   }
 };
 
 // Delete an issue
-const deleteIssue = async (_id, project) => {
+const deleteIssue = async (_id, projectId) => {
   try {
-    const deletedIssue = await Issue.findOneAndDelete({ _id, projectId: project }).exec();
+    const result = await Issue.deleteOne({ _id, projectId }).exec();
     
-    if (!deletedIssue) {
-      throw new Error(`No issue found to delete with _id: "${_id}" and project: "${project}"`);
+    if (result.deletedCount === 0) {
+      throw new Error(`No issue found to delete with _id: "${_id}" and project: "${projectId}"`);
     }
 
-    return deletedIssue;
+    return { result: 'successfully deleted', _id };
   } catch (err) {
-    throw new Error(`Failed to delete issue with _id: "${_id}" for project "${project}": ${err.message}`);
+    throw new Error(`Failed to delete issue with _id: "${_id}" for project "${projectId}": ${err.message}`);
   }
 };
 
