@@ -1,11 +1,16 @@
 // controllers/issueController.js
 
-const { Issue } = require('../models/issueModel');
+const { Issue, Project } = require('../models/issueModel');
 
 // Get issues by project
 const getIssuesByProject = async (project) => {
   try {
-    return await Issue.find({ project }).exec();
+    const projectModel = await Project.findOne({ name: project });
+    if (!projectModel) {
+      throw new Error(`Project "${project}" not found`);
+    }
+
+    return await Issue.find({ projectId: projectModel._id }).exec();
   } catch (err) {
     throw new Error(`Failed to retrieve issues for project "${project}": ${err.message}`);
   }

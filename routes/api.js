@@ -27,7 +27,7 @@ module.exports = function (app) {
       const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
     
       if (!issue_title || !issue_text || !created_by) {
-        return res.status(400).send("Required field(s) missing");
+        return res.status(400).send("Required fields missing");
       }
     
       try {
