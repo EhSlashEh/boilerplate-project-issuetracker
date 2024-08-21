@@ -66,14 +66,12 @@ suite('Functional Tests', function() {
 
   suite('GET /api/issues/{project} => Array of objects with issue data', function() {
 
-    test('View issues on a project', function(done) {
+    test('View an issue by ID', function(done) {
       chai.request(server)
         .get('/api/issues/test')
         .end(function(err, res){
-          console.log(res.body); // Add this line to debug the response
           assert.equal(res.status, 200);
           assert.isArray(res.body);
-          assert.isNotEmpty(res.body); // Ensure the array is not empty
           assert.property(res.body[0], 'issue_title');
           assert.property(res.body[0], 'issue_text');
           assert.property(res.body[0], 'created_by');

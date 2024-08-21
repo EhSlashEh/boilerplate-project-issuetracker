@@ -1,51 +1,51 @@
 'use strict';
 const {
-  getIssuesByProject,
+  getIssueById,
   createIssue,
   updateIssue,
   deleteIssue
 } = require('../controllers/issueController');
 const IssueModel = require("../models/issueModel").Issue;
-const ProjectModel = require("../models/issueModel").Project;
 
 module.exports = function (app) {
 
   app.route('/api/issues/:project')
 
+    // Get an issue by its ID
     .get(async function (req, res) {
-      let projectName = req.params.project;
+      let issueId = req.params.project; // Assuming `project` parameter is actually the issue ID
       try {
-        const issues = await getIssuesByProject(projectName);
-        res.json(issues);
+        const issue = await getIssueById(issueId);
+        if (issue) {
+          res.json(issue);
+        } else {
+          res.status(404).send("Issue not found");
+        }
       } catch (err) {
         res.status(500).send(err.message);
       }
     })
 
+    // Create a new issue
     .post(async function (req, res) {
-      let project = req.params.project;
+      const { project } = req.params; // If `project` is needed for creating issues
       const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
-    
+
       if (!issue_title || !issue_text || !created_by) {
         return res.status(400).send("Required fields missing");
       }
-    
+
       try {
-        let projectModel = await ProjectModel.findOne({ name: project });
-        if (!projectModel) {
-          projectModel = new ProjectModel({ name: project });
-          projectModel = await projectModel.save();
-        }
         const newIssue = await createIssue(project, issue_title, issue_text, created_by, assigned_to, status_text);
         res.json(newIssue);
       } catch (err) {
-        console.error('Error creating issue:', err); // Add this line
+        console.error('Error creating issue:', err);
         res.status(500).send(err.message);
       }
     })
-    
+
+    // Update an existing issue
     .put(async function (req, res) {
-      let projectName = req.params.project;
       const { _id, issue_title, issue_text, created_by, assigned_to, status_text, open } = req.body;
 
       if (!_id) {
@@ -53,12 +53,7 @@ module.exports = function (app) {
       }
 
       try {
-        const projectModel = await ProjectModel.findOne({ name: projectName });
-        if (!projectModel) {
-          return res.status(400).send("Project not found");
-        }
-
-        const updatedIssue = await updateIssue(_id, projectModel._id, { issue_title, issue_text, created_by, assigned_to, status_text, open });
+        const updatedIssue = await updateIssue(_id, { issue_title, issue_text, created_by, assigned_to, status_text, open });
         if (updatedIssue) {
           res.send("successfully updated");
         } else {
@@ -69,8 +64,8 @@ module.exports = function (app) {
       }
     })
 
+    // Delete an issue
     .delete(async function (req, res) {
-      let projectName = req.params.project;
       const { _id } = req.body;
 
       if (!_id) {
@@ -78,12 +73,7 @@ module.exports = function (app) {
       }
 
       try {
-        const projectModel = await ProjectModel.findOne({ name: projectName });
-        if (!projectModel) {
-          return res.status(400).send("Project not found");
-        }
-
-        const deletedIssue = await deleteIssue(_id, projectModel._id);
+        const deletedIssue = await deleteIssue(_id);
         if (deletedIssue) {
           res.send(`deleted ${_id}`);
         } else {

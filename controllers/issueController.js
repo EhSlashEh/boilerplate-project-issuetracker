@@ -1,24 +1,20 @@
-// controllers/issueController.js
+const { Issue } = require('../models/issueModel');
 
-const { Issue, Project } = require('../models/issueModel');
-
-// Get issues by project
-const getIssuesByProject = async (project) => {
+// Get an issue by its ID
+const getIssueById = async (issueId) => {
   try {
-    const projectModel = await Project.findOne({ name: project });
-    if (!projectModel) {
-      console.log('No project found with name:', project);
-      return []; // Handle the case where no project is found
+    const issue = await Issue.findById(issueId).exec();
+    if (!issue) {
+      console.log('No issue found with ID:', issueId);
+      return null; // Handle the case where no issue is found
     }
 
-    const issues = await Issue.find({ projectId: projectModel._id }).exec();
-    console.log('Issues found:', issues); // Log the issues found
-    return issues;
+    console.log('Issue found:', issue); // Log the issue found
+    return issue;
   } catch (err) {
-    throw new Error(`Failed to retrieve issues for project "${project}": ${err.message}`);
+    throw new Error(`Failed to retrieve issue with ID "${issueId}": ${err.message}`);
   }
 };
-
 
 // Create a new issue
 const createIssue = async (project, issue_title, issue_text, created_by, assigned_to = '', status_text = '') => {
@@ -78,7 +74,7 @@ const deleteIssue = async (_id, project) => {
 };
 
 module.exports = {
-  getIssuesByProject,
+  getIssueById,
   createIssue,
   updateIssue,
   deleteIssue
