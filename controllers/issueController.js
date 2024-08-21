@@ -7,7 +7,7 @@ const getIssuesByProject = async (project) => {
   try {
     const projectModel = await Project.findOne({ name: project });
     if (!projectModel) {
-      throw new Error(`Project "${project}" not found`);
+      return []; // Return an empty array if the project doesn't exist
     }
 
     return await Issue.find({ projectId: projectModel._id }).exec();

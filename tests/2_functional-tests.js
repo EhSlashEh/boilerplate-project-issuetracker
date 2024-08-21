@@ -70,6 +70,7 @@ suite('Functional Tests', function() {
       chai.request(server)
         .get('/api/issues/test')
         .end(function(err, res){
+          console.log(res.body); // Add this line to debug the response
           assert.equal(res.status, 200);
           assert.isArray(res.body);
           assert.property(res.body[0], 'issue_title');
