@@ -29,7 +29,7 @@ module.exports = function (app) {
     // Create a new issue
     .post(async function (req, res) {
       const { project } = req.params; // If `project` is needed for creating issues
-      const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
+      const { issue_title, issue_text, created_by, assigned_to = '', status_text = '' } = req.body;
 
       if (!issue_title || !issue_text || !created_by) {
         return res.status(400).send("Required fields missing");

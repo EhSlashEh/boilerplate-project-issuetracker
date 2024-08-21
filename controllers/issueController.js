@@ -5,14 +5,11 @@ const getIssueById = async (issueId) => {
   try {
     const issue = await Issue.findById(issueId).exec();
     if (!issue) {
-      console.log('No issue found with ID:', issueId);
-      return null; // Handle the case where no issue is found
+      throw new Error('Issue not found');
     }
-
-    console.log('Issue found:', issue); // Log the issue found
     return issue;
   } catch (err) {
-    throw new Error(`Failed to retrieve issue with ID "${issueId}": ${err.message}`);
+    throw new Error(`Failed to retrieve issue with _id: "${issueId}": ${err.message}`);
   }
 };
 
