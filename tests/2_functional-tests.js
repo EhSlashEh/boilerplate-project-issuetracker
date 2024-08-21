@@ -73,6 +73,7 @@ suite('Functional Tests', function() {
           console.log(res.body); // Add this line to debug the response
           assert.equal(res.status, 200);
           assert.isArray(res.body);
+          assert.isNotEmpty(res.body); // Ensure the array is not empty
           assert.property(res.body[0], 'issue_title');
           assert.property(res.body[0], 'issue_text');
           assert.property(res.body[0], 'created_by');

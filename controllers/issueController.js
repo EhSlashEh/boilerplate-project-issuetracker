@@ -7,14 +7,18 @@ const getIssuesByProject = async (project) => {
   try {
     const projectModel = await Project.findOne({ name: project });
     if (!projectModel) {
-      return []; // Return an empty array if the project doesn't exist
+      console.log('No project found with name:', project);
+      return []; // Handle the case where no project is found
     }
 
-    return await Issue.find({ projectId: projectModel._id }).exec();
+    const issues = await Issue.find({ projectId: projectModel._id }).exec();
+    console.log('Issues found:', issues); // Log the issues found
+    return issues;
   } catch (err) {
     throw new Error(`Failed to retrieve issues for project "${project}": ${err.message}`);
   }
 };
+
 
 // Create a new issue
 const createIssue = async (project, issue_title, issue_text, created_by, assigned_to = '', status_text = '') => {
