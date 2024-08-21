@@ -101,22 +101,27 @@ module.exports = function (app) {
 
     // Delete an issue
     .delete(async function (req, res) {
+      let projectName = req.params.project;
       const { _id } = req.body;
-
       if (!_id) {
-        return res.status(400).send("Missing _id");
+        res.json({ error: "missing _id" });
+        return;
       }
-
       try {
-        const deletedIssue = await deleteIssue(_id);
-        if (deletedIssue) {
-          res.send(`deleted ${_id}`);
-        } else {
-          res.status(400).send("Could not delete");
+        const projectModel = await ProjectModel.findOne({ name: projectName });
+        if (!projectModel) {
+          throw new Error("project not found");
         }
+        const result = await IssueModel.deleteOne({
+          _id: _id,
+          projectId: projectModel._id,
+        });
+        if (result.deletedCount === 0) {
+          throw new Error("ID not found");
+        }
+        res.json({ result: "successfully deleted", _id: _id });
       } catch (err) {
-        res.status(500).send(err.message);
+        res.json({ error: "cold not delete", _id: _id });
       }
     });
-
 };

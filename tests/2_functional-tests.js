@@ -5,6 +5,40 @@ const server = require('../server');
 
 chai.use(chaiHttp);
 
+let issue1;
+let issue2;
+suite("Functional Tests", function () {
+  suite("Routing Tests", function () {
+    suite("3 Post request Tests", function () {
+      test("Create an issue with every field: POST request to /api/issues/{project}")
+      chai
+        .request(server)
+        .post("/api/issues/testing123")
+        .set("content-type", "application/json")
+        .send({
+          issue_title: "Issue 1",
+          issue_text: "Functional Test",
+          created_by: "fCC",
+          assigned_to: "Dom",
+          status_text: "Not Done",
+        })
+        .end(function (err, res) {
+          assert.equal(res.status,200);
+          issue1 = res.body;
+          assert.equal(res.body.issue_title, "Issue 1");
+          assert.equal(res.body.assigned_to, "Dom");
+          assert.equal(res.body.created_by, "fCC");
+          assert.equal(res.body.status_text, "Not Done");
+          assert.equal(res.body.issue_text, "Functional Test");
+          done();
+        });
+    }).timeout(10000);
+
+  })
+})
+
+
+/*
 suite('Functional Tests', function() {
 
   suite('POST /api/issues/{project} => object with issue data', function() {
@@ -234,3 +268,4 @@ suite('Functional Tests', function() {
   });
 
 });
+*/
