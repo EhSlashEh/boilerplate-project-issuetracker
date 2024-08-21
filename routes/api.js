@@ -1,15 +1,18 @@
 'use strict';
+
 const {
   getIssueById,
   createIssue,
   updateIssue,
   deleteIssue
 } = require('../controllers/issueController');
-const IssueModel = require("../models/issueModel").Issue;
+
+const IssueModel = require("../models").Issue;
+const ProjectModel = require("../models").Project;
 
 module.exports = function (app) {
 
-  app.route('/api/issues/:issueId')
+  app.route('/api/issues/:project')
 
     // Get an issue by its ID
     .get(async function (req, res) {
