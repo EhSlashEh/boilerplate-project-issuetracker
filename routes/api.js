@@ -34,6 +34,8 @@ module.exports = function (app) {
       const projectName = req.params.project;
       const { issue_title, issue_text, created_by, assigned_to = '', status_text = '' } = req.body;
 
+      console.log('Request Body:', req.body); // Log request body for debugging
+
       if (!issue_title || !issue_text || !created_by) {
         return res.status(400).send("Required fields missing");
       }
@@ -46,6 +48,7 @@ module.exports = function (app) {
         const newIssue = await createIssue(project._id, issue_title, issue_text, created_by, assigned_to, status_text);
         res.json(newIssue);
       } catch (err) {
+        console.error('Error creating issue:', err); // Log error for debugging
         res.status(500).send(`Error creating issue: ${err.message}`);
       }
     })
