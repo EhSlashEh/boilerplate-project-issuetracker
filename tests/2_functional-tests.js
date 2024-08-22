@@ -95,15 +95,20 @@ suite("Functional Tests", function() {
         .request(server)
         .put("/api/issues/test")
         .send({
-          _id: id1,
-          issue_text: "new text"
+          _id: issueId,
+          issue_text: "Updated text"
         })
         .end(function(err, res) {
-          assert.equal(res.body, "successfully updated");
+          if (err) return done(err);
+    
+          // Check that the response contains the expected object structure
+          assert.equal(res.body.result, 'successfully updated');
+          assert.equal(res.body._id, issueId);
+    
           done();
         });
     });
-
+    
     test("Multiple fields to update", function(done) {
       chai
         .request(server)
@@ -187,31 +192,29 @@ suite("Functional Tests", function() {
         .delete("/api/issues/test")
         .send({})
         .end(function(err, res) {
-          assert.equal(res.body, "id error");
+          assert.deepEqual(res.body, { error: 'missing _id' });
           done();
         });
     });
-
+  
     test("Valid _id", function(done) {
       chai
         .request(server)
         .delete("/api/issues/test")
         .send({ _id: id1 })
         .end(function(err, res) {
-          assert.equal(res.body, "deleted " + id1);
-
+          assert.deepEqual(res.body, { result: 'successfully deleted', _id: id1 });
+  
           chai
           .request(server)
           .delete("/api/issues/test")
-          .send({
-            _id: id2
-          })
+          .send({ _id: id2 })
           .end(function(err, res) {
-            assert.equal(res.body, "deleted " + id2);
+            assert.deepEqual(res.body, { result: 'successfully deleted', _id: id2 });
             done();
           });
-
+  
         });
     });
   });
-  });
+    });
