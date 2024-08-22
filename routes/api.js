@@ -46,8 +46,9 @@ module.exports = function (app) {
     
     .post(async function (req, res) {
       var project = req.params.project;
+
       if (!req.body.issue_title || !req.body.issue_text || !req.body.created_by) {
-        return res.json('Required fields missing from request');
+        return res.json({ error: 'required field(s) missing' });
       }
     
       let newIssue = new Issue({
@@ -73,6 +74,12 @@ module.exports = function (app) {
     
     .put(async function (req, res){
       var project = req.params.project;
+      let _id = req.body._id;
+
+      if (!_id) {
+        return res.json({ error: 'missing _id' });
+      }
+
       let updateObject = {};
 
       Object.keys(req.body).forEach((key) => {
@@ -82,44 +89,46 @@ module.exports = function (app) {
       });
 
       if(Object.keys(updateObject).length === 0){
-        return res.json('no updated field sent')
+        return res.json({ error: 'no update field(s) sent', '_id': _id });
       }
 
       updateObject['updated_on'] = new Date().toUTCString();
 
       try {
         const updatedIssue = await Issue.findByIdAndUpdate(
-          req.body._id,
+          _id,
           updateObject,
           { new: true }
         );
 
         if (updatedIssue) {
-          return res.json('successfully updated');
+          return res.json({ result: 'successfully updated', '_id': _id });
         } else {
-          return res.json('could not update ' + req.body._id);
+          return res.json({ error: 'could not update', '_id': _id });
         }
       } catch (error) {
-        return res.status(500).json('There was an error updating the issue');
+        return res.json({ error: 'could not update', '_id': _id });
       }
     })
     
     .delete(async function (req, res) {
       var project = req.params.project;
-      if (!req.body._id) {
-        return res.json('id error');
+      const { _id } = req.body;
+    
+      if (!_id) {
+        return res.json({ error: 'missing _id' });
       }
-      
+    
       try {
-        const deletedIssue = await Issue.findByIdAndRemove(req.body._id);
+        const deletedIssue = await Issue.findByIdAndRemove(_id);
         if (deletedIssue) {
-          return res.json('deleted ' + req.body._id);
+          return res.json({ result: 'successfully deleted', _id: _id });
         } else {
-          return res.json('could not delete ' + req.body._id);
+          return res.json({ error: 'could not delete', _id: _id });
         }
       } catch (error) {
-        return res.status(500).json('There was an error deleting the issue');
+        return res.json({ error: 'could not delete', _id: _id });
       }
     });
-        
+            
 };
