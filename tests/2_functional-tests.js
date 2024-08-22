@@ -72,7 +72,7 @@ suite("Functional Tests", function() {
             issue_title: "Title"
           })
           .end(function(err, res) {
-            assert.equal(res.body, 'Required fields missing from request');
+            assert.deepEqual(res.body, { error: 'required field(s) missing' });
             done();
           });
       });
@@ -85,7 +85,7 @@ suite("Functional Tests", function() {
         .put("/api/issues/test")
         .send({})
         .end(function(err, res) {
-          assert.equal(res.body, "no updated field sent");
+          assert.deepEqual(res.body, { error: 'missing _id' });
           done();
         });
     });
