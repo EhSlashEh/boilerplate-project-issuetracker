@@ -42,11 +42,12 @@ module.exports = function (app) {
       )
     })
     
-    .post(function (req, res){
+    .post(async function (req, res) {
       var project = req.params.project;
-      if(!req.body.issue_title || !req.body.issue_text || !req.body.created_by){
-        return res.json('Required fields missing from request')
+      if (!req.body.issue_title || !req.body.issue_text || !req.body.created_by) {
+        return res.json('Required fields missing from request');
       }
+    
       let newIssue = new Issue({
         issue_title: req.body.issue_title,
         issue_text: req.body.issue_text,
@@ -57,14 +58,16 @@ module.exports = function (app) {
         created_on: new Date().toUTCString(),
         updated_on: new Date().toUTCString(),
         project: project
-      })
-      newIssue.save((error, savedIssue) => {
-        if(!error && savedIssue){
-          return res.json(savedIssue)
-        }
-      })
-      
+      });
+    
+      try {
+        const savedIssue = await newIssue.save();
+        return res.json(savedIssue);
+      } catch (error) {
+        return res.status(500).json('There was an error saving the issue');
+      }
     })
+    
     
     .put(function (req, res){
       var project = req.params.project;
