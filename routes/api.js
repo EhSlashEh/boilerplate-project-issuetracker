@@ -28,9 +28,23 @@ module.exports = function (app) {
 
   app.route('/api/issues/:project')
   
-    .get(function (req, res){
+    .get(async function (req, res){
       var project = req.params.project;
-      let filterObject = Object.assign(req.query)
+      // let filterObject = Object.assign(req.query);
+      let filterObject = { ...req.query, project };
+
+      try {
+        const arrayOfResults = await Issue.find(filterObject);
+        if (arrayOfResults) {
+          return res.json(arrayOfResults);
+        } else {
+          return res.json([]); // Return an empty array if no results found
+        }
+      } catch (error) {
+        return res.status(500).json('There was an error retrieving the issues');
+      }
+
+      /*
       filterObject['project'] =project
       Issue.find(
         filterObject,
@@ -40,6 +54,7 @@ module.exports = function (app) {
           }
         }
       )
+        */
     })
     
     .post(async function (req, res) {
@@ -79,7 +94,7 @@ module.exports = function (app) {
         }
       });
 
-      if(Object.keys(updateObject).length < 2){
+      if(Object.keys(updateObject).length === 0){
         return res.json('no updated field sent')
       }
 
