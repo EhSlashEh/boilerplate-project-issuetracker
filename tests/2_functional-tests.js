@@ -77,7 +77,7 @@ suite("Functional Tests", function() {
           });
       });
   })
-
+  
   suite("PUT /api/issues/{project} => text", function() {
     test("No body", function(done) {
       chai
@@ -89,27 +89,36 @@ suite("Functional Tests", function() {
           done();
         });
     });
-
+  
     test("One field to update", function(done) {
+      // Ensure id1 is set in previous POST test
+      if (!id1) {
+        return done(new Error('id1 is not defined'));
+      }
+  
       chai
         .request(server)
         .put("/api/issues/test")
         .send({
-          _id: issueId,
+          _id: id1, // Use id1 here
           issue_text: "Updated text"
         })
         .end(function(err, res) {
           if (err) return done(err);
-    
+  
           // Check that the response contains the expected object structure
           assert.equal(res.body.result, 'successfully updated');
-          assert.equal(res.body._id, issueId);
-    
+          assert.equal(res.body._id, id1);
+  
           done();
         });
     });
-    
+  
     test("Multiple fields to update", function(done) {
+      if (!id2) {
+        return done(new Error('id2 is not defined'));
+      }
+  
       chai
         .request(server)
         .put("/api/issues/test")
@@ -119,13 +128,16 @@ suite("Functional Tests", function() {
           issue_text: "new text"
         })
         .end(function(err, res) {
-          assert.equal(res.body, "successfully updated");
+          if (err) return done(err);
+  
+          // Check that the response contains the expected object structure
+          assert.deepEqual(res.body, { result: 'successfully updated', '_id': id2 });
+  
           done();
         });
     });
   });
-
-  suite("GET /api/issues/{project} => Array of objects with issue data", function() {
+    suite("GET /api/issues/{project} => Array of objects with issue data", function() {
       test("No filter", function(done) {
         chai
           .request(server)
