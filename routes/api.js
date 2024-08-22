@@ -122,20 +122,35 @@ module.exports = function (app) {
       var project = req.params.project;
       const { _id } = req.body;
     
+      // Debugging: log the request body
+      console.log('DELETE Request Body:', req.body);
+    
       if (!_id) {
+        // Debugging: log the missing ID case
+        console.log('Error: missing _id');
         return res.json({ error: 'missing _id' });
       }
     
       try {
         const deletedIssue = await Issue.findByIdAndRemove(_id);
+        
+        // Debugging: log the result of deletion
+        console.log('Deleted Issue:', deletedIssue);
+    
         if (deletedIssue) {
+          // Debugging: log success case
+          console.log('Success: Issue deleted');
           return res.json({ result: 'successfully deleted', _id: _id });
         } else {
+          // Debugging: log if no issue was found
+          console.log('Error: could not delete - Issue not found');
           return res.json({ error: 'could not delete', _id: _id });
         }
       } catch (error) {
+        // Debugging: log exception
+        console.log('Exception:', error);
         return res.json({ error: 'could not delete', _id: _id });
       }
     });
-            
+                
 };
