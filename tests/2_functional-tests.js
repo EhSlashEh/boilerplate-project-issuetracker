@@ -120,100 +120,98 @@ suite("Functional Tests", function() {
     });
   });
 
-    suite(
-      "GET /api/issues/{project} => Array of objects with issue data",
-      function() {
-        test("No filter", function(done) {
-          chai
-            .request(server)
-            .get("/api/issues/test")
-            .query({})
-            .end(function(err, res) {
-              assert.equal(res.status, 200);
-              assert.isArray(res.body);
-              assert.property(res.body[0], "issue_title");
-              assert.property(res.body[0], "issue_text");
-              assert.property(res.body[0], "created_on");
-              assert.property(res.body[0], "updated_on");
-              assert.property(res.body[0], "created_by");
-              assert.property(res.body[0], "assigned_to");
-              assert.property(res.body[0], "open");
-              assert.property(res.body[0], "status_text");
-              assert.property(res.body[0], "_id");
-              done();
-            });
-        });
-
-        test("One filter", function(done) {
-          chai
-            .request(server)
-            .get("/api/issues/test")
-            .query({ created_by: "Functional Test - Every field filled in" })
-            .end(function(err, res) {
-              res.body.forEach(issueResult => {
-                assert.equal(
-                  issueResult.created_by,
-                  "Functional Test - Every field filled in"
-                );
-              });
-              done();
-            });
-        });
-
-        test("Multiple filters (test for multiple fields you know will be in the db for a return)", function(done) {
-          chai
-            .request(server)
-            .get("/api/issues/test")
-            .query({
-              open: true,
-              created_by: "Functional Test - Every field filled in"
-            })
-            .end(function(err, res) {
-              res.body.forEach(issueResult => {
-                assert.equal(issueResult.open, true);
-                assert.equal(
-                  issueResult.created_by,
-                  "Functional Test - Every field filled in"
-                );
-              });
-              done();
-            });
-        });
-      }
-    );
-
-    suite("DELETE /api/issues/{project} => text", function() {
-      test("No _id", function(done) {
+  suite("GET /api/issues/{project} => Array of objects with issue data", function() {
+      test("No filter", function(done) {
         chai
           .request(server)
-          .delete("/api/issues/test")
-          .send({})
+          .get("/api/issues/test")
+          .query({})
           .end(function(err, res) {
-            assert.equal(res.body, "id error");
+            assert.equal(res.status, 200);
+            assert.isArray(res.body);
+            assert.property(res.body[0], "issue_title");
+            assert.property(res.body[0], "issue_text");
+            assert.property(res.body[0], "created_on");
+            assert.property(res.body[0], "updated_on");
+            assert.property(res.body[0], "created_by");
+            assert.property(res.body[0], "assigned_to");
+            assert.property(res.body[0], "open");
+            assert.property(res.body[0], "status_text");
+            assert.property(res.body[0], "_id");
             done();
           });
       });
 
-      test("Valid _id", function(done) {
+      test("One filter", function(done) {
         chai
           .request(server)
-          .delete("/api/issues/test")
-          .send({ _id: id1 })
+          .get("/api/issues/test")
+          .query({ created_by: "Functional Test - Every field filled in" })
           .end(function(err, res) {
-            assert.equal(res.body, "deleted " + id1);
-
-            chai
-            .request(server)
-            .delete("/api/issues/test")
-            .send({
-              _id: id2
-            })
-            .end(function(err, res) {
-              assert.equal(res.body, "deleted " + id2);
-              done();
+            res.body.forEach(issueResult => {
+              assert.equal(
+                issueResult.created_by,
+                "Functional Test - Every field filled in"
+              );
             });
-  
+            done();
           });
       });
+
+      test("Multiple filters (test for multiple fields you know will be in the db for a return)", function(done) {
+        chai
+          .request(server)
+          .get("/api/issues/test")
+          .query({
+            open: true,
+            created_by: "Functional Test - Every field filled in"
+          })
+          .end(function(err, res) {
+            res.body.forEach(issueResult => {
+              assert.equal(issueResult.open, true);
+              assert.equal(
+                issueResult.created_by,
+                "Functional Test - Every field filled in"
+              );
+            });
+            done();
+          });
+      });
+    }
+  );
+
+  suite("DELETE /api/issues/{project} => text", function() {
+    test("No _id", function(done) {
+      chai
+        .request(server)
+        .delete("/api/issues/test")
+        .send({})
+        .end(function(err, res) {
+          assert.equal(res.body, "id error");
+          done();
+        });
     });
+
+    test("Valid _id", function(done) {
+      chai
+        .request(server)
+        .delete("/api/issues/test")
+        .send({ _id: id1 })
+        .end(function(err, res) {
+          assert.equal(res.body, "deleted " + id1);
+
+          chai
+          .request(server)
+          .delete("/api/issues/test")
+          .send({
+            _id: id2
+          })
+          .end(function(err, res) {
+            assert.equal(res.body, "deleted " + id2);
+            done();
+          });
+
+        });
+    });
+  });
   });

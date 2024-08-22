@@ -72,45 +72,52 @@ module.exports = function (app) {
     })
     
     
-    .put(async function (req, res){
+    .put(async function (req, res) {
       var project = req.params.project;
       let _id = req.body._id;
-
+    
       if (!_id) {
         return res.json({ error: 'missing _id' });
       }
-
+    
       let updateObject = {};
-
+    
+      // Create an updateObject with all fields except `_id`
       Object.keys(req.body).forEach((key) => {
-        if (req.body[key] != '' && key !== '_id') {
-          updateObject[key] = req.body[key]
+        if (req.body[key] !== '' && key !== '_id') {
+          updateObject[key] = req.body[key];
         }
       });
-
-      if(Object.keys(updateObject).length === 0){
+    
+      // If no fields are provided for update, return an error
+      if (Object.keys(updateObject).length === 0) {
         return res.json({ error: 'no update field(s) sent', '_id': _id });
       }
-
+    
+      // Set the `updated_on` field to the current date and time
       updateObject['updated_on'] = new Date().toUTCString();
-
+    
       try {
+        // Find the issue by ID and update it with the provided fields
         const updatedIssue = await Issue.findByIdAndUpdate(
           _id,
           updateObject,
-          { new: true }
+          { new: true }  // Return the updated document
         );
-
+    
         if (updatedIssue) {
+          // Return success response with the updated issue ID
           return res.json({ result: 'successfully updated', '_id': _id });
         } else {
+          // Return error response if no issue was found with the provided ID
           return res.json({ error: 'could not update', '_id': _id });
         }
       } catch (error) {
+        // Return error response in case of any exception
         return res.json({ error: 'could not update', '_id': _id });
       }
     })
-    
+        
     .delete(async function (req, res) {
       var project = req.params.project;
       const { _id } = req.body;
