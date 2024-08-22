@@ -69,30 +69,37 @@ module.exports = function (app) {
     })
     
     
-    .put(function (req, res){
+    .put(async function (req, res){
       var project = req.params.project;
-      let updateObject = {}
+      let updateObject = {};
+
       Object.keys(req.body).forEach((key) => {
-        if(req.body[key] != ''){
+        if (req.body[key] != '' && key !== '_id') {
           updateObject[key] = req.body[key]
         }
-      })
+      });
+
       if(Object.keys(updateObject).length < 2){
         return res.json('no updated field sent')
       }
-      updateObject['updated_on'] = new Date().toUTCString()
-      Issue.findByIdAndUpdate(
-      req.body._id,
-      updateObject,
-      {new: true},
-      (error, updatedIssue) => {
-       if(!error && updatedIssue){
-          return res.json('successfully updated')
-        }else if(!updatedIssue){
-          return res.json('could not update '+ req.body._id)
+
+      updateObject['updated_on'] = new Date().toUTCString();
+
+      try {
+        const updatedIssue = await Issue.findByIdAndUpdate(
+          req.body._id,
+          updateObject,
+          { new: true }
+        );
+
+        if (updatedIssue) {
+          return res.json('successfully updated');
+        } else {
+          return res.json('could not update ' + req.body._id);
         }
+      } catch (error) {
+        return res.status(500).json('There was an error updating the issue');
       }
-        )
     })
     
     .delete(function (req, res){
