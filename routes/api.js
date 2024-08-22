@@ -132,7 +132,7 @@ module.exports = function (app) {
       }
     
       try {
-        const deletedIssue = await Issue.findByIdAndRemove(_id);
+        const deletedIssue = await Issue.findByIdAndDelete(_id);
         
         // Debugging: log the result of deletion
         console.log('Deleted Issue:', deletedIssue);
