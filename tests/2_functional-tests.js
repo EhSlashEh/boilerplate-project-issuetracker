@@ -198,21 +198,21 @@ suite("Functional Tests", function() {
         chai
           .request(server)
           .delete("/api/issues/test")
-          .send({
-            _id: id1
-          })
+          .send({ _id: id1 })
           .end(function(err, res) {
             assert.equal(res.body, "deleted " + id1);
-          });
-        chai
-          .request(server)
-          .delete("/api/issues/test")
-          .send({
-            _id: id2
-          })
-          .end(function(err, res) {
-            assert.equal(res.body, "deleted " + id2);
-            done();
+
+            chai
+            .request(server)
+            .delete("/api/issues/test")
+            .send({
+              _id: id2
+            })
+            .end(function(err, res) {
+              assert.equal(res.body, "deleted " + id2);
+              done();
+            });
+  
           });
       });
     });
